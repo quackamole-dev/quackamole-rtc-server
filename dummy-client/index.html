@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Playback recorded MediaStream</title>
+    <style>
+        textarea {
+            background: wheat;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        button {
+            display: block;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+<button onclick="openSocket()">Open Websocket</button>
+<input type="checkbox" id="is-https">
+
+<!-- RELAY -->
+<textarea id="receiverIds" name="receiverIds" placeholder="Socket ids to receive the payload. Broadcast to all in room if empty."></textarea>
+<textarea id="payload" name="payload" placeholder="The payload which all sockets are going to receive"></textarea>
+<button onclick="sendData(receiverIds.value, payload.value, roomId.value)">Relay payload</button>
+
+<!-- JOIN ROOM -->
+<input id="roomId" name="roomId" placeholder="the room id you want to join" value="dummy-room-id" />
+<button onclick="joinRoom(roomId.value)">Join room</button>
+
+<button onclick="createRoom()">Create room</button>
+</body>
+<script src="script.js"></script>
+</html>
