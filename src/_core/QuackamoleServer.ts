@@ -1,11 +1,10 @@
-import * as uWS from 'uWebSockets.js';
+import fs from 'fs';
+import path from 'path';
+import {App, SSLApp, TemplatedApp, us_listen_socket_close} from 'uWebSockets.js';
 import Routes from '../routes';
-import config from './config';
-import {SocketController} from "./SocketService";
-import {App, SSLApp, TemplatedApp, us_listen_socket_close} from "uWebSockets.js";
-import {RoomService} from "../services/RoomService";
-import path from "path";
-import fs from "fs";
+import {RoomService} from '../services/RoomService';
+import {SocketService} from './SocketService';
+import {setCorsHeaders} from '../helpers/setCorsHeaders';
 
 
 export class QuackamoleServer {
@@ -26,28 +25,25 @@ export class QuackamoleServer {
 
     this.registerHttpRoutes();
     new RoomService();
-    new SocketController(this.app);
+    new SocketService(this.app);
   }
 
   private registerHttpRoutes() {
 
-    this.app.get('/*', (res, req) => {
-      /* It does Http as well */
-      res.writeStatus('200 OK').writeHeader('IsExample', 'Yes').end('Hello there!');
-    })
-
+    // this.app.get('/*', (res, req) => {
+    //   /* It does Http as well */
+    //   res.writeStatus('200 OK').writeHeader('IsExample', 'Yes').end('Hello there!');
+    // })
 
     Routes.forEach(route => {
       this.app[route.method](route.route, async (res, req) => {
         res.onAborted(() => console.log('aborted response'));
         try {
-          // setCorsHeaders(res); // FIXME writeStatus() must be called before otherwise response with default status. Rethink where to set cors
-          if (!(await route.permission(req))) {
-            return res.writeStatus('403 Forbidden').end();
-          }
+          if (!(await route.permission(req))) return res.writeStatus('403 Forbidden').end();
 
           // IMPORTANT: req cannot be used after await https://github.com/uNetworking/uWebSockets.js/discussions/328#discussioncomment-173449
           // It's available within the handler but any data needed (parameters, query, body) must be gathered before await!
+          setCorsHeaders(res); // FIXME writeStatus() must be called before otherwise response with default status. Rethink where to set cors
           await route.handler(res, req);
         } catch (e) {
           // TODO ensure res.end() || res.close() can never be called multiple times, as that will crash the server
@@ -55,6 +51,18 @@ export class QuackamoleServer {
           console.error(e);
         }
       });
+    });
+
+    this.app.get('/', async res => { // TODO remove, this is temporary for experimenting
+      try {
+        const filepath = path.resolve(__dirname, `../../dummy-client/index.html`);
+        let content = fs.readFileSync(filepath).toString();
+        // if (this.sslEnabled) content = content.split(`http://localhost:`).join(`https://localhost:`);
+        // if (this.port !== 12000) content = content.split(`:12000`).join(`:${this.port}`);
+        res.writeHeader('Content-Type', 'text/html').writeStatus('200 OK').end(content);
+      } catch (e) {
+        res.writeStatus('404 Not Found').end();
+      }
     });
   }
 

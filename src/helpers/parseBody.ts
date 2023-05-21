@@ -14,11 +14,11 @@ export const parseBodyString = (res: HttpResponse): Promise<string> => new Promi
   res.onAborted(() => reject(null));
 });
 
-export const parseBodyObj = async <T>(res: HttpResponse): Promise<T | null> => {
+export const parseBodyObj = async <T>(res: HttpResponse): Promise<T> => {
   try {
     const raw = await parseBodyString(res);
-    return JSON.parse(raw) as T;
+    return (raw === '' ? {} : JSON.parse(raw)) as T;
   } catch (e) {
-    return null;
+    return {} as T;
   }
 };

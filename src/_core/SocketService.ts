@@ -1,9 +1,9 @@
-import {IRoom, RoomId, RoomJoinErrorCode, RoomService} from '../services/RoomService';
-import {TemplatedApp, WebSocket} from "uWebSockets.js";
-import {randomUUID} from "crypto";
+import {IBaseRoom, RoomId, RoomJoinErrorCode, RoomService} from '../services/RoomService';
+import {TemplatedApp, WebSocket} from 'uWebSockets.js';
+import {randomUUID} from 'crypto';
 
 
-export class SocketController {
+export class SocketService {
   readonly sockets: Map<string, WebSocket> = new Map();
   private app: TemplatedApp;
 
@@ -27,7 +27,7 @@ export class SocketController {
     this.sockets.set(ws.id, ws);
     // Send the new socket its own id
     ws.send(JSON.stringify({topic: `personal`, id: ws.id, type: 'init'}));
-    console.log('socket joined', ws.id);
+    console.log('socket opened', ws.id);
   }
 
   private closeSocketHandler(ws: WebSocket): void {
@@ -94,7 +94,7 @@ export class SocketController {
   private handleJoinRoom(ws: WebSocket, message: IJoinRoomMessage): void {
     const error: RoomJoinErrorCode = RoomService.instance.join(ws.id, message.roomId);
 
-    if (error)  {
+    if (error) {
       console.log(`Socket ${ws.id} failed joining roomID: ${message.roomId}:`, error);
       ws.send(JSON.stringify({topic: 'personal', type: 'join_room', awaitId: message.awaitId, error}));
       return;
@@ -107,24 +107,6 @@ export class SocketController {
     const room = RoomService.instance.getRoomById(message.roomId);
     ws.send(JSON.stringify({topic: 'personal', type: 'join_room', room, awaitId: message.awaitId}));
     ws.publish(topic, JSON.stringify({topic, type: 'join_room', roomId: message.roomId, socketId: ws.id}));
-  }
-
-  private isBroadcastMessage(message: ISocketMessage): message is IBroadcastMessage {
-    // used when message should be sent to all sockets in a room
-    return message.action === 'broadcast';
-  }
-
-  private isRelayMessage(message: ISocketMessage): message is IRelayMessage {
-    // used when there is a need for more control over which sockets should receive the message
-    return message.action === 'relay';
-  }
-
-  private isJoinRoomMessage(message: ISocketMessage): message is IJoinRoomMessage {
-    return message.action === 'join_room';
-  }
-
-  private isCreateRoomMessage(message: ISocketMessage): message is ICreateRoomMessage {
-    return message.action === 'create_room';
   }
 }
 
@@ -173,7 +155,7 @@ export interface IRelayMessage extends IBaseSocketMessage {
 
 
 export interface ICreateRoomMessage extends IBaseSocketMessage {
-  data: Partial<IRoom>;
+  data: Partial<IBaseRoom>;
 }
 
 

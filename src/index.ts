@@ -9,4 +9,6 @@ const argv = yargs(process.argv.slice(2)).options({
   port: {type: 'number', default: 12000, describe: 'port'},
 }).parseSync();
 
-new Server(argv.ssl_cert, argv.ssl_key, argv.port).start();
+// FIXME undo
+// new QuackamoleServer('../../test/localhost.crt', '../../test/localhost.key', argv.port).start();
+new QuackamoleServer(argv.ssl_cert, argv.ssl_key, argv.port).start();
