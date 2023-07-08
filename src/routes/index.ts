@@ -1,5 +1,6 @@
 import {HttpRequest, HttpResponse} from 'uWebSockets.js';
 import {RoomRoutes} from './RoomRoutes';
+import { PluginRoutes } from './PluginRoutes';
 
 export type HttpHandler = (res: HttpResponse, req: HttpRequest) => Promise<HttpResponse>;
 
@@ -25,6 +26,7 @@ export const placeholderHandler = async (res: HttpResponse, req: HttpRequest): P
 
 const Routes = [
   ...RoomRoutes,
+  ...PluginRoutes
 ];
 
 export default Routes;

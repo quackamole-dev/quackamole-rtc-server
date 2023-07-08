@@ -91,10 +91,10 @@
 
       if (receiverIds) {
         console.log(`Relaying the following data: ${data} to receiverIds ${receiverIds}`);
-        socket.send(JSON.stringify({data, receiverIds, roomId, action: 'relay'}))
+        socket.send(JSON.stringify({data, receiverIds, roomId, action: 'user_to_user'}))
       } else {
         console.log(`Broadcasting the following data: ${data} to roomIds ${[roomId]}`);
-        socket.send(JSON.stringify({data, roomIds: [roomId], action: 'broadcast'}));
+        socket.send(JSON.stringify({data, roomIds: [roomId], action: 'room_broadcast'}));
       }
     }
   }
@@ -140,7 +140,7 @@
 
     awaitedPromises[awaitId].promise = promise;
 
-    return [{roomId, awaitId, action: 'join_room'}, promise];
+    return [{roomId, awaitId, action: 'room_join'}, promise];
   }
 
 

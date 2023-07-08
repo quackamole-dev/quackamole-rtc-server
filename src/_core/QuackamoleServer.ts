@@ -1,10 +1,13 @@
 import fs from 'fs';
 import path from 'path';
-import {App, SSLApp, TemplatedApp, us_listen_socket_close} from 'uWebSockets.js';
+import { App, SSLApp, TemplatedApp, us_listen_socket_close } from 'uWebSockets.js';
 import Routes from '../routes';
-import {RoomService} from '../services/RoomService';
-import {SocketService} from './SocketService';
-import {setCorsHeaders} from '../helpers/setCorsHeaders';
+import { RoomService } from '../services/RoomService';
+import { SocketService } from './SockerServer';
+import { setCorsHeaders } from '../helpers/setCorsHeaders';
+import { UserService } from '../services/UserService';
+import { PluginRoutes } from '../routes/PluginRoutes';
+import { PluginService } from '../services/PluginService';
 
 
 export class QuackamoleServer {
@@ -21,10 +24,12 @@ export class QuackamoleServer {
 
     this.sslEnabled = Boolean(cert_file_name && key_file_name && fs.existsSync(filepathCert) && fs.existsSync(filepathKey));
     cert_file_name && key_file_name && !this.sslEnabled && console.warn('ssl cert or key not found');
-    this.app = this.sslEnabled ? SSLApp({cert_file_name: filepathCert, key_file_name: filepathKey}) : App();
+    this.app = this.sslEnabled ? SSLApp({ cert_file_name: filepathCert, key_file_name: filepathKey }) : App();
 
     this.registerHttpRoutes();
     new RoomService();
+    new PluginService();
+    new UserService();
     new SocketService(this.app);
   }
 

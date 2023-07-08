@@ -1,5 +1,7 @@
-import {SocketId} from '../_core/SocketService';
-import {randomUUID} from 'crypto';
+import { SocketId } from '../_core/SockerServer';
+import { randomUUID } from 'crypto';
+import { UserId } from './UserService';
+import { IPlugin, PluginService } from './PluginService';
 
 
 export class RoomService {
@@ -30,7 +32,15 @@ export class RoomService {
   }
 
   createRoom(roomRaw: Partial<IBaseRoom>): IAdminRoom {
-    const room: IAdminRoom = this.sanitize(roomRaw);
+    const room: IAdminRoom = {
+      id: randomUUID(),
+      adminId: randomUUID(),
+      name: roomRaw.name || 'default room name',
+      maxUsers: roomRaw.maxUsers || 4,
+      joinedUsers: [],
+      adminUsers: [],
+    };
+
     this.rooms[room.id] = room;
     this.adminIdToRoomIdMap[room.adminId] = room.id;
     console.log(`Room: ${room.name} was created. RoomId: ${room.id}`);
@@ -54,24 +64,35 @@ export class RoomService {
     if (!id) return;
     const room: IBaseRoom | undefined = this.getRoomById(id);
     if (!room) return;
-
     room.name = data.name || room.name;
     room.maxUsers = data.maxUsers || room.maxUsers;
 
     return room;
   }
 
-  join(socketId: SocketId, roomId: RoomId): RoomJoinErrorCode {
-    const asAdmin: boolean = Boolean(this.adminIdToRoomIdMap[roomId]);
-    const id = asAdmin ? this.adminIdToRoomIdMap[roomId] : roomId;
-
-    const room: IBaseRoom | undefined = this.rooms[id];
+  join(socketId: SocketId, roomId: RoomId, adminId?: string): RoomJoinErrorCode {
+    const room: IAdminRoom | undefined = this.rooms[roomId];
     if (!room) return 'does_not_exist';
     if (room.joinedUsers.includes(socketId)) return 'already_joined';
     if (room.joinedUsers.length >= room.maxUsers) return 'already_full';
+    if (adminId && room.adminId !== adminId) return 'invalid_admin_id';
+    this.rooms[roomId].joinedUsers.push(socketId);
+    adminId && this.rooms[roomId].adminUsers.push(socketId);
+  }
 
-    this.rooms[id].joinedUsers.push(socketId);
-    asAdmin && this.rooms[id].adminUsers.push(socketId);
+  setPlugin(roomId: RoomId, pluginId: string, userId: UserId): PluginSetErrorCode {
+    const room: IBaseRoom | undefined = this.getRoomById(roomId);
+    const plugin: IPlugin | undefined = PluginService.instance.getPluginById(pluginId);
+    if (!this.isAdminUser(roomId, userId)) return 'permission_denied';
+    if (!room) return 'room_not_found';
+    if (!plugin) return 'plugin_not_found';
+    room.plugin = plugin;
+  }
+
+  isAdminUser(roomId: string, userId: string): boolean {
+    const room: IBaseRoom | undefined = this.getRoomById(roomId);
+    if (!room) return false;
+    return room.adminUsers.includes(userId);
   }
 
   leave(socketId: SocketId, roomIds: RoomId[]): void {
@@ -81,17 +102,6 @@ export class RoomService {
       this.rooms[roomId].joinedUsers = room.joinedUsers.filter(id => id !== socketId);
     }
   }
-
-  private sanitize(rawRoomData: Partial<IAdminRoom>): IAdminRoom {
-    return {
-      id: randomUUID(),
-      adminId: randomUUID(),
-      name: rawRoomData.name || 'default room name',
-      maxUsers: rawRoomData.maxUsers || 4,
-      joinedUsers: [],
-      adminUsers: [],
-    };
-  }
 }
 
 export interface IBaseRoom {
@@ -100,6 +110,7 @@ export interface IBaseRoom {
   maxUsers: number;
   joinedUsers: string[]; // TODO make IUser but maybe only when retrieving or on demand?
   adminUsers: string[];
+  plugin?: IPlugin;
   metadata?: JSON;
   parentRoom?: IBaseRoom;
   childRooms?: IBaseRoom[];
@@ -109,6 +120,7 @@ export interface IAdminRoom extends IBaseRoom {
   adminId: RoomId; // TODO implement
 }
 
-export type RoomJoinErrorCode = 'wrong_password' | 'already_full' | 'does_not_exist' | 'already_joined' | null | undefined;
+export type RoomJoinErrorCode = 'wrong_password' | 'already_full' | 'does_not_exist' | 'already_joined' | 'invalid_admin_id' | null | undefined;
+export type PluginSetErrorCode = 'room_not_found' | 'permission_denied' | 'plugin_not_found' | null | undefined;
 
 export type RoomId = string;
