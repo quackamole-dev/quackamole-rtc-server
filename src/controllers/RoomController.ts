@@ -1,7 +1,8 @@
+import * as Quack from 'quackamole-shared-types';
 import {HttpRequest, HttpResponse} from 'uWebSockets.js';
 import {HttpHandler} from '../routes';
 import {parseBodyObj} from '../helpers/parseBody';
-import {IBaseRoom, RoomService} from '../services/RoomService';
+import {RoomService} from '../services/RoomService';
 
 
 export const list: HttpHandler = async (res: HttpResponse, req: HttpRequest) => {
@@ -17,7 +18,7 @@ export const retrieve: HttpHandler = async (res: HttpResponse, req: HttpRequest)
 };
 
 export const create: HttpHandler = async (res: HttpResponse, req: HttpRequest) => {
-  const body = await parseBodyObj<Partial<IBaseRoom>>(res);
+  const body = await parseBodyObj<Partial<Quack.IBaseRoom>>(res);
   if (!body) return res.writeStatus('404 Not Found').end();
   const room = RoomService.instance.createRoom(body);
   if (!room) return res.writeStatus('404 Not Found').end();

@@ -1,16 +1,17 @@
 import { randomUUID } from 'crypto';
+import * as Quack from 'quackamole-shared-types';
 
 
 export class UserService {
   static instance: UserService;
-  private readonly users: Map<string, IUser> = new Map();
+  private readonly users: Map<string, Quack.IUser> = new Map();
   private readonly userSecretToUserIdMap: Map<string, string> = new Map();
 
   constructor() {
     UserService.instance = this;
   }
 
-  createUser(displayName: string): [IUser, string] {
+  createUser(displayName: string): [Quack.IUser, string] {
     console.log('creating user', displayName);
     const id = randomUUID();
     const secret = randomUUID();
@@ -27,17 +28,17 @@ export class UserService {
     if (user) user.displayName = newDisplayName
   }
 
-  getUserById(id: string): IUser | undefined {
+  getUserById(id: string): Quack.IUser | undefined {
     return this.users.get(id);
   }
 
-  getUsersById(ids: string[]): IUser[] {
+  getUsersById(ids: string[]): Quack.IUser[] {
     return ids
     .map(id => this.users.get(id))
-    .filter(u => Boolean(u)) as IUser[];
+    .filter(u => Boolean(u)) as Quack.IUser[];
   }
 
-  getUserBySecret(secret: string): IUser | undefined {
+  getUserBySecret(secret: string): Quack.IUser | undefined {
     console.log('getUserBySecret', this.userSecretToUserIdMap);
     const id = this.userSecretToUserIdMap.get(secret);
     if (!id) return;
@@ -48,18 +49,4 @@ export class UserService {
     const id = this.userSecretToUserIdMap.get(secret);
     return id === userId && id !== undefined;
   }
-}
-
-export type UserId = string;
-
-export interface IUser {
-  id: UserId;
-  displayName: string;
-  status: string;
-  lastSeen: number;
-}
-
-export interface IUserSecret {
-  userId: string;
-  secret: string;
 }

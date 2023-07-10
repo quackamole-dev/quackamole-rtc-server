@@ -6,7 +6,6 @@ import { RoomService } from '../services/RoomService';
 import { SocketService } from './SockerServer';
 import { setCorsHeaders } from '../helpers/setCorsHeaders';
 import { UserService } from '../services/UserService';
-import { PluginRoutes } from '../routes/PluginRoutes';
 import { PluginService } from '../services/PluginService';
 
 
