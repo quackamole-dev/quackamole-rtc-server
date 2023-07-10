@@ -14,6 +14,7 @@ export class RoomService {
       maxUsers: 4,
       joinedUsers: [],
       adminUsers: [],
+      metadata: {}
     },
     'dummy-room-id-2': {
       id: 'dummy-room-id-2',
@@ -22,6 +23,7 @@ export class RoomService {
       maxUsers: 4,
       joinedUsers: [],
       adminUsers: [],
+      metadata: {}
     },
   };
 
@@ -39,6 +41,7 @@ export class RoomService {
       maxUsers: roomRaw.maxUsers || 4,
       joinedUsers: [],
       adminUsers: [],
+      metadata: {}
     };
 
     this.rooms[room.id] = room;
@@ -80,13 +83,14 @@ export class RoomService {
     adminId && this.rooms[roomId].adminUsers.push(socketId);
   }
 
-  setPlugin(roomId: RoomId, pluginId: string, userId: UserId): PluginSetErrorCode {
+  setPlugin(roomId: RoomId, plugin: IPlugin | null, userId: UserId, iframeId: string): [IPlugin | null, PluginSetErrorCode] {
     const room: IBaseRoom | undefined = this.getRoomById(roomId);
-    const plugin: IPlugin | undefined = PluginService.instance.getPluginById(pluginId);
-    if (!this.isAdminUser(roomId, userId)) return 'permission_denied';
-    if (!room) return 'room_not_found';
-    if (!plugin) return 'plugin_not_found';
-    room.plugin = plugin;
+    // if (!this.isAdminUser(roomId, userId)) return [null, 'permission_denied']; // TODO fix join as admin
+    if (!room) return [null, 'room_not_found'];
+    const pluginDb: IPlugin | undefined = PluginService.instance.getPluginById(plugin?.id);
+    if (plugin && !pluginDb) return [null, 'plugin_not_found_in_db'];
+    room.metadata[`plugin-${iframeId}`] = plugin;
+    return [pluginDb || null, null]
   }
 
   isAdminUser(roomId: string, userId: string): boolean {
@@ -111,7 +115,7 @@ export interface IBaseRoom {
   joinedUsers: string[]; // TODO make IUser but maybe only when retrieving or on demand?
   adminUsers: string[];
   plugin?: IPlugin;
-  metadata?: JSON;
+  metadata: Record<string, unknown>;
   parentRoom?: IBaseRoom;
   childRooms?: IBaseRoom[];
 }
@@ -121,6 +125,6 @@ export interface IAdminRoom extends IBaseRoom {
 }
 
 export type RoomJoinErrorCode = 'wrong_password' | 'already_full' | 'does_not_exist' | 'already_joined' | 'invalid_admin_id' | null | undefined;
-export type PluginSetErrorCode = 'room_not_found' | 'permission_denied' | 'plugin_not_found' | null | undefined;
+export type PluginSetErrorCode = 'room_not_found' | 'permission_denied' | 'plugin_not_found_in_db' | null | undefined;
 
 export type RoomId = string;

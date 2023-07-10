@@ -31,6 +31,12 @@ export class UserService {
     return this.users.get(id);
   }
 
+  getUsersById(ids: string[]): IUser[] {
+    return ids
+    .map(id => this.users.get(id))
+    .filter(u => Boolean(u)) as IUser[];
+  }
+
   getUserBySecret(secret: string): IUser | undefined {
     console.log('getUserBySecret', this.userSecretToUserIdMap);
     const id = this.userSecretToUserIdMap.get(secret);

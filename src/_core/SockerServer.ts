@@ -1,7 +1,8 @@
-import { IAdminRoom, IBaseRoom, PluginSetErrorCode, RoomId, RoomJoinErrorCode, RoomService } from '../services/RoomService';
+import { IAdminRoom, IBaseRoom, RoomId, RoomJoinErrorCode, RoomService } from '../services/RoomService';
 import { TemplatedApp, WebSocket } from 'uWebSockets.js';
 import { randomUUID } from 'crypto';
 import { IUser, UserId, UserService } from '../services/UserService';
+import { IPlugin } from '../services/PluginService';
 
 export class SocketService {
   readonly sockets: Map<string, WebSocket> = new Map();
@@ -126,7 +127,8 @@ export class SocketService {
     console.log(`Socket ${ws.id} joined roomID: ${message.data.roomId}`);
     const room = RoomService.instance.getRoomById(message.data.roomId);
     if (!room) throw new Error(`Room ${message.data.roomId} not found`);
-    const res: IRoomJoinResponseMessage = { type: 'room_join_response', awaitId: message.awaitId!, room, errors: [] };
+    const users = UserService.instance.getUsersById(room.joinedUsers);
+    const res: IRoomJoinResponseMessage = { type: 'room_join_response', awaitId: message.awaitId!, room, users, errors: [] };
     ws.send(JSON.stringify(res));
     const roomEventMessage: IRoomEventJoinMessage = { type: 'room_event', roomId: message.data.roomId, eventType: 'user_joined', data: { user: ws.user } };
     ws.publish(topic, JSON.stringify(roomEventMessage));
@@ -156,16 +158,16 @@ export class SocketService {
   }
 
   private handlePluginSet(ws: WebSocket, message: IPluginSetMessage): void {
-    const { roomId, pluginId } = message.data;
-    const error: PluginSetErrorCode = this.roomService.setPlugin(roomId, pluginId, ws.user.id);
+    const { roomId, plugin, iframeId } = message.data;
+    const [pluginDb, error] = this.roomService.setPlugin(roomId, plugin, ws.user.id, iframeId);
     if (error) {
-      const res: IPluginSetResponseMessage = { type: 'plugin_set_response', awaitId: message.awaitId!, roomId, pluginId, errors: [error] };
+      const res: IPluginSetResponseMessage = { type: 'plugin_set_response', awaitId: message.awaitId!, roomId, iframeId, plugin: pluginDb, errors: [error] };
       return ws.send(JSON.stringify(res)) as any;
     }
 
-    const res: IPluginSetResponseMessage = { type: 'plugin_set_response', awaitId: message.awaitId!, roomId, pluginId, errors: [] };
+    const res: IPluginSetResponseMessage = { type: 'plugin_set_response', awaitId: message.awaitId!, roomId, iframeId, plugin: pluginDb, errors: [] };
     ws.send(JSON.stringify(res));
-    const roomEventMessage: IRoomEventPluginSet = { type: 'room_event', roomId: message.data.roomId, eventType: 'plugin_set', data: { roomId, pluginId } };
+    const roomEventMessage: IRoomEventPluginSet = { type: 'room_event', roomId: message.data.roomId, eventType: 'plugin_set', data: { roomId, iframeId, plugin: pluginDb } };
     ws.publish(`rooms/${roomId}`, JSON.stringify(roomEventMessage));
   }
 }
@@ -194,7 +196,7 @@ export interface IUserLoginResponseMessage extends IBaseResponseMessage {
 export interface IRoomJoinResponseMessage extends IBaseResponseMessage {
   type: 'room_join_response';
   room: IBaseRoom;
-  // error: RoomJoinErrorCode;
+  users: IUser[];
 }
 
 export interface IRoomCreateResponseMessage {
@@ -211,7 +213,8 @@ export interface IMessageRelayDeliveryMessage extends IBaseResponseMessage {
 export interface IPluginSetResponseMessage extends IBaseResponseMessage {
   type: 'plugin_set_response';
   roomId: RoomId;
-  pluginId: string;
+  iframeId: string;
+  plugin: IPlugin | null;
 }
 
 ///////////////////////////////////////////
@@ -239,7 +242,7 @@ export interface IRoomEventUserDataChangeMessage extends IBaseRoomEventMessage {
 
 export interface IRoomEventPluginSet extends IBaseRoomEventMessage {
   eventType: 'plugin_set';
-  data: { roomId: RoomId, pluginId: string };
+  data: { roomId: RoomId, iframeId: string, plugin: IPlugin | null };
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -282,5 +285,5 @@ export interface IUserLoginMessage extends IBaseSocketToServerMessage {
 }
 
 export interface IPluginSetMessage extends IBaseSocketToServerMessage {
-  data: { roomId: string, pluginId: string };
+  data: { roomId: string, iframeId: string, plugin: IPlugin | null };
 }

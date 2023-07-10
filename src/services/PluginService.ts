@@ -17,7 +17,8 @@ export class PluginService {
     return Object.values(this.plugins);
   }
 
-  getPluginById(id: string): IPlugin | undefined {
+  getPluginById(id: string | undefined): IPlugin | undefined {
+    if (!id) return;
     return this.plugins[id];
   }
 }
