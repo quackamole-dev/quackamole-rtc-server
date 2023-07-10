@@ -75,8 +75,7 @@
     "forceConsistentCasingInFileNames": true        /* Disallow inconsistently-cased references to the same file. */
   },
   "include": [
-    "src",
-    "../../../../AppData/Local/JetBrains/PyCharm2020.3/javascript/typings/node/14.14.37/node_modules/@types/node/globals.d.ts"
+    "src"
   ],
   "exclude": [
     "node_modules",

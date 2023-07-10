@@ -1,7 +1,7 @@
 {
-  "name": "quackamole-rtc",
-  "version": "0.0.0",
-  "description": "Wrapper for the standard webrtc api. Intended to be used in conjunction with quackamole-rtc-signal",
+  "name": "quackamole-rtc-server",
+  "version": "0.0.1",
+  "description": "Server for the Quackamole webrtc project. Intended to be used together with quackamole-rtc-client",
   "main": "dist/index.js",
   "bin": "dist/index.js",
   "types": "dist/index.d.ts",
