@@ -20,6 +20,7 @@ export interface IRoute {
 }
 
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const placeholderHandler = async (res: HttpResponse, req: HttpRequest): Promise<HttpResponse> => {
   throw Error('handler not implemented');
 };

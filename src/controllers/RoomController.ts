@@ -5,6 +5,7 @@ import {parseBodyObj} from '../helpers/parseBody';
 import {RoomService} from '../services/RoomService';
 
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const list: HttpHandler = async (res: HttpResponse, req: HttpRequest) => {
   const serialized = JSON.stringify(RoomService.instance.getAllRooms());
   return res.writeHeader('Content-Type', 'application/json').end(serialized);
@@ -17,6 +18,7 @@ export const retrieve: HttpHandler = async (res: HttpResponse, req: HttpRequest)
   return res.writeStatus('200 OK').writeHeader('Content-Type', 'application/json').end(serialized);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const create: HttpHandler = async (res: HttpResponse, req: HttpRequest) => {
   const body = await parseBodyObj<Partial<Quack.IBaseRoom>>(res);
   if (!body) return res.writeStatus('404 Not Found').end();

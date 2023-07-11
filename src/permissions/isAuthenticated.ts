@@ -1,6 +1,7 @@
 import {HttpRequest} from 'uWebSockets.js';
 // import {isJWTValid} from '../helpers/checkJwt';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isAuthenticated = async (req: HttpRequest): Promise<boolean> => {
   // const token = req.getHeader('token');
   // console.log('-----------token header', token);

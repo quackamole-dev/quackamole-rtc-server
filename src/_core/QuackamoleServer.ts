@@ -60,7 +60,7 @@ export class QuackamoleServer {
     this.app.get('/', async res => { // TODO remove, this is temporary for experimenting
       try {
         const filepath = path.resolve(__dirname, `../../dummy-client/index.html`);
-        let content = fs.readFileSync(filepath).toString();
+        const content = fs.readFileSync(filepath).toString();
         // if (this.sslEnabled) content = content.split(`http://localhost:`).join(`https://localhost:`);
         // if (this.port !== 12000) content = content.split(`:12000`).join(`:${this.port}`);
         res.writeHeader('Content-Type', 'text/html').writeStatus('200 OK').end(content);

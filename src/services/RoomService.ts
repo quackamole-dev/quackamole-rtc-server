@@ -50,7 +50,7 @@ export class RoomService {
   }
 
   getRoomById(roomId: Quack.RoomId): Quack.IBaseRoom | undefined {
-    const asAdmin: boolean = Boolean(this.adminIdToRoomIdMap[roomId]);
+    const asAdmin = Boolean(this.adminIdToRoomIdMap[roomId]);
     const id = asAdmin ? this.adminIdToRoomIdMap[roomId] : roomId;
 
     const room = this.rooms[id];
