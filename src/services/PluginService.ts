@@ -1,6 +1,5 @@
 import * as Quack from 'quackamole-shared-types';
 
-
 export class PluginService {
   static instance: PluginService;
   private readonly plugins: Record<string, Quack.IPlugin> = {

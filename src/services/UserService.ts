@@ -1,7 +1,6 @@
 import { randomUUID } from 'crypto';
 import * as Quack from 'quackamole-shared-types';
 
-
 export class UserService {
   static instance: UserService;
   private readonly users: Map<string, Quack.IUser> = new Map();
@@ -25,7 +24,7 @@ export class UserService {
     const user = this.getUserById(userId);
     if (newDisplayName.length > 20) return 'Display name too long';
     if (newDisplayName.length < 3) return 'Display name too short';
-    if (user) user.displayName = newDisplayName
+    if (user) user.displayName = newDisplayName;
   }
 
   getUserById(id: string): Quack.IUser | undefined {
@@ -34,8 +33,8 @@ export class UserService {
 
   getUsersById(ids: string[]): Quack.IUser[] {
     return ids
-    .map(id => this.users.get(id))
-    .filter(u => Boolean(u)) as Quack.IUser[];
+      .map(id => this.users.get(id))
+      .filter(u => Boolean(u)) as Quack.IUser[];
   }
 
   getUserBySecret(secret: string): Quack.IUser | undefined {

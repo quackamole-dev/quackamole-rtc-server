@@ -4,7 +4,6 @@ import {HttpHandler} from '../routes';
 import {parseBodyObj} from '../helpers/parseBody';
 import {RoomService} from '../services/RoomService';
 
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const list: HttpHandler = async (res: HttpResponse, req: HttpRequest) => {
   const serialized = JSON.stringify(RoomService.instance.getAllRooms());

@@ -2,7 +2,6 @@ import * as Quack from 'quackamole-shared-types';
 import { randomUUID } from 'crypto';
 import { PluginService } from './PluginService';
 
-
 export class RoomService {
   static instance: RoomService;
   private readonly rooms: Record<Quack.RoomId, Quack.IAdminRoom> = {
@@ -89,7 +88,7 @@ export class RoomService {
     const pluginDb: Quack.IPlugin | undefined = PluginService.instance.getPluginById(plugin?.id);
     if (plugin && !pluginDb) return [null, 'plugin_not_found_in_db'];
     room.metadata[`plugin-${iframeId}`] = plugin;
-    return [pluginDb || null, null]
+    return [pluginDb || null, null];
   }
 
   isAdminUser(roomId: string, userId: string): boolean {

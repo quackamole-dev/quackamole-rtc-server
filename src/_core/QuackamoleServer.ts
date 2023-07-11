@@ -7,7 +7,7 @@ import { SocketService } from './SockerServer';
 import { setCorsHeaders } from '../helpers/setCorsHeaders';
 import { UserService } from '../services/UserService';
 import { PluginService } from '../services/PluginService';
-
+import { lookup } from 'mime-types';
 
 export class QuackamoleServer {
   private listenSocket: unknown = null;
@@ -34,13 +34,8 @@ export class QuackamoleServer {
 
   private registerHttpRoutes() {
 
-    // this.app.get('/*', (res, req) => {
-    //   /* It does Http as well */
-    //   res.writeStatus('200 OK').writeHeader('IsExample', 'Yes').end('Hello there!');
-    // })
-
     Routes.forEach(route => {
-      this.app[route.method](route.route, async (res, req) => {
+      this.app[route.method]('/api' + route.route, async (res, req) => {
         res.onAborted(() => console.log('aborted response'));
         try {
           if (!(await route.permission(req))) return res.writeStatus('403 Forbidden').end();
@@ -57,15 +52,19 @@ export class QuackamoleServer {
       });
     });
 
-    this.app.get('/', async res => { // TODO remove, this is temporary for experimenting
+    // // TODO remove or disable for PROD builds- This is to be used during development only.
+    this.app.get('/*', (res, req) => {
       try {
-        const filepath = path.resolve(__dirname, `../../dummy-client/index.html`);
-        const content = fs.readFileSync(filepath).toString();
-        // if (this.sslEnabled) content = content.split(`http://localhost:`).join(`https://localhost:`);
-        // if (this.port !== 12000) content = content.split(`:12000`).join(`:${this.port}`);
-        res.writeHeader('Content-Type', 'text/html').writeStatus('200 OK').end(content);
+        let requestPath = req.getUrl();
+        if (requestPath == '/') requestPath = '/index.html';
+        const filePath = path.join(__dirname, 'public', requestPath);
+        if (!filePath.startsWith(path.resolve(__dirname, 'public'))) res.writeStatus('403 permission_denied').end();
+        if (!fs.existsSync(filePath)) return res.writeStatus('404 Not Found').end();
+        const content = fs.readFileSync(filePath).toString();
+        const mimeType = lookup(filePath);
+        res.writeHeader('Content-Type', mimeType || 'text/plain').writeStatus('200 OK').end(content);
       } catch (e) {
-        res.writeStatus('404 Not Found').end();
+        res.writeStatus('500 Internal Server Error').end();
       }
     });
   }
@@ -88,6 +87,7 @@ export class QuackamoleServer {
     if (this.listenSocket) {
       us_listen_socket_close(this.listenSocket);
       console.log(`Quackamole Server stopped on ${this.sslEnabled ? 'https' : 'http'}://localhost:${this.port}, listenSocket:`, this.listenSocket);
+
       this.listenSocket = null;
     }
     return this;

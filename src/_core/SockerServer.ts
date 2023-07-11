@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as Q from 'quackamole-shared-types';
 import { RoomService } from '../services/RoomService';
 import { TemplatedApp, WebSocket } from 'uWebSockets.js';
@@ -52,7 +53,7 @@ export class SocketService {
     else if (message.action === 'user_register') this.handleUserRegister(ws, message as Q.IUserRegisterMessage);
     else if (message.action === 'user_login') this.handleUserLogin(ws, message as Q.IUserLoginMessage);
     else if (message.action === 'plugin_set') this.handlePluginSet(ws, message as Q.IPluginSetMessage);
-    else console.log(`no message handler found`);
+    else console.log('no message handler found');
   }
 
   private parseMessage(ws: WebSocket, rawMessage: ArrayBuffer): Q.SocketToServerMessage {
@@ -125,7 +126,7 @@ export class SocketService {
 
     const [user, secret] = this.userService.createUser(message.data.displayName);
     ws.user = user;
-    ws.secret = secret
+    ws.secret = secret;
     this.sendJson<Q.IUserRegisterResponseMessage>(ws, { type: 'user_register_response', awaitId: message.awaitId!, user, secret, errors: [] });
   }
 

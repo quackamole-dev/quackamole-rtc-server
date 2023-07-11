@@ -4,7 +4,6 @@ import { PluginRoutes } from './PluginRoutes';
 
 export type HttpHandler = (res: HttpResponse, req: HttpRequest) => Promise<HttpResponse>;
 
-
 export interface IRoute {
   method: 'get' | 'post' | 'options' | 'del' | 'patch' | 'put';
   route: string,
@@ -18,7 +17,6 @@ export interface IRoute {
   permission: (req: HttpRequest) => Promise<boolean>,
   // serializer: typeof BaseSerializer,
 }
-
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const placeholderHandler = async (res: HttpResponse, req: HttpRequest): Promise<HttpResponse> => {
