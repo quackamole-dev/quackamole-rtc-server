@@ -1,7 +1,12 @@
 import { RequestMessage } from 'quackamole-shared-types';
 import {WebSocket} from 'uWebSockets.js';
+import { handleMessageRelay } from './handleMessageRelay';
+import { handlePluginSet } from './handlePluginSet';
 import { handleRoomBroadcast } from './handleRoomBroadcast';
-import { handleMessageRelay, handlePluginSet, handleRoomCreate, handleRoomJoin, handleUserLogin, handleUserRegister } from './handler';
+import { handleRoomCreate } from './handleRoomCreate';
+import { handleRoomJoin } from './handleRoomJoin';
+import { handleUserLogin } from './handleUserLogin';
+import { handleUserRegister } from './handleUserRegister';
 
 export type MessageHandler = (ws: WebSocket, message: RequestMessage) => void;
 
