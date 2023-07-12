@@ -36,7 +36,7 @@
     "eslint-plugin-import": "npm:eslint-plugin-i@^2.27.5-4",
     "mocha": "^10.2.0",
     "nodemon": "^2.0.20",
-    "quackamole-shared-types": "^0.0.4",
+    "quackamole-shared-types": "^0.1.0",
     "sinon": "^15.0.4",
     "sinon-chai": "^3.7.0",
     "typescript": "^4.8.3"
