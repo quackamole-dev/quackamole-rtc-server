@@ -1,6 +1,6 @@
 {
   "name": "quackamole-rtc-server",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Server for the Quackamole webrtc project. Intended to be used together with quackamole-rtc-client",
   "main": "dist/index.js",
   "bin": "dist/index.js",
@@ -32,9 +32,11 @@
     "chai": "^4.3.7",
     "chai-http": "^4.3.0",
     "eslint": "^8.23.1",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "npm:eslint-plugin-i@^2.27.5-4",
     "mocha": "^10.2.0",
     "nodemon": "^2.0.20",
-    "quackamole-shared-types": "^0.0.3",
+    "quackamole-shared-types": "^0.0.4",
     "sinon": "^15.0.4",
     "sinon-chai": "^3.7.0",
     "typescript": "^4.8.3"

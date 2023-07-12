@@ -1,7 +1,8 @@
+
 import * as RoomController from '../controllers/RoomController';
-import isAuthenticated from '../permissions/isAuthenticated';
+import {isAdmin} from '../permissions/isAdmin';
+import {isAuthenticated} from '../permissions/isAuthenticated';
 import {IRoute} from './index';
-import isAdmin from '../permissions/isAdmin';
 
 export const BaseRoomRoute = '/rooms';
 

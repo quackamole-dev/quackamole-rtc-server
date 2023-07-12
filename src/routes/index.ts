@@ -1,9 +1,8 @@
 import {HttpRequest, HttpResponse} from 'uWebSockets.js';
-import {RoomRoutes} from './RoomRoutes';
 import { PluginRoutes } from './PluginRoutes';
+import {RoomRoutes} from './RoomRoutes';
 
 export type HttpHandler = (res: HttpResponse, req: HttpRequest) => Promise<HttpResponse>;
-
 export interface IRoute {
   method: 'get' | 'post' | 'options' | 'del' | 'patch' | 'put';
   route: string,
@@ -23,9 +22,7 @@ export const placeholderHandler = async (res: HttpResponse, req: HttpRequest): P
   throw Error('handler not implemented');
 };
 
-const Routes = [
+export const Routes = [
   ...RoomRoutes,
   ...PluginRoutes
 ];
-
-export default Routes;

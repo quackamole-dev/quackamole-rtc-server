@@ -1,5 +1,6 @@
+
 import * as PluginController from '../controllers/PluginController';
-import isAuthenticated from '../permissions/isAuthenticated';
+import {isAuthenticated} from '../permissions/isAuthenticated';
 import { IRoute } from './index';
 
 export const BasePluginRoute = '/plugins';

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import yargs from 'yargs';
-import { QuackamoleServer } from './_core/QuackamoleServer';
+import { QuackamoleServer } from './QuackamoleServer';
 
 const argv = yargs(process.argv.slice(2)).options({
   ssl_cert: { type: 'string', default: '', describe: 'ssl certificate' },

@@ -1,5 +1,5 @@
-import * as Quack from 'quackamole-shared-types';
 import { randomUUID } from 'crypto';
+import * as Quack from 'quackamole-shared-types';
 import { PluginService } from './PluginService';
 
 export class RoomService {
@@ -71,7 +71,7 @@ export class RoomService {
     return room;
   }
 
-  join(socketId: Quack.SocketId, roomId: Quack.RoomId, adminId?: string): Quack.RoomJoinErrorCode {
+  join(socketId: Quack.SocketId, roomId: Quack.RoomId, adminId?: string): Quack.RoomJoinErrorCode | undefined {
     const room: Quack.IAdminRoom | undefined = this.rooms[roomId];
     if (!room) return 'does_not_exist';
     if (room.joinedUsers.includes(socketId)) return 'already_joined';
@@ -81,14 +81,14 @@ export class RoomService {
     adminId && this.rooms[roomId].adminUsers.push(socketId);
   }
 
-  setPlugin(roomId: Quack.RoomId, plugin: Quack.IPlugin | null, userId: Quack.UserId, iframeId: string): [Quack.IPlugin | null, Quack.PluginSetErrorCode] {
+  setPlugin(roomId: Quack.RoomId, plugin: Quack.IPlugin | null, userId: Quack.UserId, iframeId: string): [Quack.IPlugin | null, Quack.PluginSetErrorCode | ''] {
     const room: Quack.IBaseRoom | undefined = this.getRoomById(roomId);
     // if (!this.isAdminUser(roomId, userId)) return [null, 'permission_denied']; // TODO fix join as admin
     if (!room) return [null, 'room_not_found'];
     const pluginDb: Quack.IPlugin | undefined = PluginService.instance.getPluginById(plugin?.id);
     if (plugin && !pluginDb) return [null, 'plugin_not_found_in_db'];
     room.metadata[`plugin-${iframeId}`] = plugin;
-    return [pluginDb || null, null];
+    return [pluginDb || null, ''];
   }
 
   isAdminUser(roomId: string, userId: string): boolean {

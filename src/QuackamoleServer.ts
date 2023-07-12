@@ -1,13 +1,17 @@
+import { randomUUID } from 'crypto';
 import fs from 'fs';
 import path from 'path';
-import { App, SSLApp, TemplatedApp, us_listen_socket_close } from 'uWebSockets.js';
-import Routes from '../routes';
-import { RoomService } from '../services/RoomService';
-import { SocketService } from './SockerServer';
-import { setCorsHeaders } from '../helpers/setCorsHeaders';
-import { UserService } from '../services/UserService';
-import { PluginService } from '../services/PluginService';
 import { lookup } from 'mime-types';
+import { IRoomEventLeaveMessage, RequestMessage } from 'quackamole-shared-types';
+import { App, SSLApp, TemplatedApp, WebSocket, us_listen_socket_close } from 'uWebSockets.js';
+import { publishJson } from './helpers/publishJson';
+import { setCorsHeaders } from './helpers/setCorsHeaders';
+import { messageHandlers } from './messageHandlers';
+import {Routes} from './routes';
+import { PluginService } from './services/PluginService';
+import { RoomService } from './services/RoomService';
+import { SocketService } from './services/SocketService';
+import { UserService } from './services/UserService';
 
 export class QuackamoleServer {
   private listenSocket: unknown = null;
@@ -29,7 +33,16 @@ export class QuackamoleServer {
     new RoomService();
     new PluginService();
     new UserService();
-    new SocketService(this.app);
+    new SocketService();
+
+    this.app.ws('/ws', {
+      idleTimeout: 0,
+      open: this.openSocketHandler.bind(this),
+      close: this.closeSocketHandler.bind(this),
+      message: this.mainMessageHandler.bind(this),
+      maxBackpressure: 1024 * 1024 * 4,
+      maxPayloadLength: 64 * 1024,
+    });
   }
 
   private registerHttpRoutes() {
@@ -87,9 +100,48 @@ export class QuackamoleServer {
     if (this.listenSocket) {
       us_listen_socket_close(this.listenSocket);
       console.log(`Quackamole Server stopped on ${this.sslEnabled ? 'https' : 'http'}://localhost:${this.port}, listenSocket:`, this.listenSocket);
-
       this.listenSocket = null;
     }
     return this;
+  }
+
+  private openSocketHandler(ws: WebSocket): void {
+    ws.id = randomUUID();
+    ws.roomIds = [];
+    console.log('socket opened', ws.id);
+  }
+
+  private closeSocketHandler(ws: WebSocket): void {
+    console.log('closing socket', ws.id);
+    SocketService.instance.sockets.delete(ws.id);
+    RoomService.instance.leave(ws.id, ws.roomIds);
+    for (const roomId of ws.roomIds) {
+      const topic = `rooms/${roomId}`;
+      console.log('close socket broadcast leave room', topic, ws.id, roomId);
+
+      publishJson<IRoomEventLeaveMessage>(this.app, topic, { type: 'room_event__user_left', roomId, timestamp: Date.now(), data: { user: ws.user } });
+    }
+  }
+
+  private mainMessageHandler(ws: WebSocket, rawMessage: ArrayBuffer): void {
+    const message: RequestMessage = this.parseSocketToServerMessage(ws, rawMessage);
+    // TODO if there is an awaitId, send back a response to let client know the message was malformed
+    if (!this.isSocketToServerMessage(message)) console.log('invalid message received', message, ws.id);
+    console.log('websocket message received', message, ws.id);
+    const actionHander = messageHandlers[message.type];
+    if (actionHander) actionHander(ws, message);
+    // TODO if there is an message.awaitId, send back a response to let client know it isn't a valid action
+    else console.log('no message handler found');
+  }
+
+  private parseSocketToServerMessage(ws: WebSocket, rawMessage: ArrayBuffer): RequestMessage {
+    const message: RequestMessage = JSON.parse(Buffer.from(rawMessage).toString());
+    message.timestamp = Date.now();
+    message.socketId = ws.id;
+    return message;
+  }
+
+  private isSocketToServerMessage(message: unknown): message is RequestMessage {
+    return typeof message === 'object' && message !== null && 'action' in message && 'data' in message;
   }
 }

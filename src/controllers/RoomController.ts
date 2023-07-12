@@ -1,7 +1,7 @@
 import * as Quack from 'quackamole-shared-types';
 import {HttpRequest, HttpResponse} from 'uWebSockets.js';
-import {HttpHandler} from '../routes';
 import {parseBodyObj} from '../helpers/parseBody';
+import {HttpHandler} from '../routes';
 import {RoomService} from '../services/RoomService';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
