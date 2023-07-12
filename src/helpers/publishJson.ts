@@ -1,5 +1,6 @@
-import { TemplatedApp, WebSocket } from 'uWebSockets.js';
+import { TemplatedApp } from 'uWebSockets.js';
+import { USocket } from '../QuackamoleServer';
 
-export const publishJson = <T>(context: WebSocket | TemplatedApp, topic: string, message: T): void => {
+export const publishJson = <T>(context: USocket | TemplatedApp, topic: string, message: T): void => {
   context.publish(topic, JSON.stringify(message));
 };

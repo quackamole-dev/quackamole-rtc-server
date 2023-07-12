@@ -1,8 +1,8 @@
-import { WebSocket } from 'uWebSockets.js';
+import { USocket } from '../QuackamoleServer';
 
 export class SocketService {
   static instance: SocketService;
-  readonly sockets: Map<string, WebSocket> = new Map();
+  readonly sockets: Map<string, USocket> = new Map();
 
   constructor() {
     SocketService.instance = this;

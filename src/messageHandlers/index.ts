@@ -1,5 +1,5 @@
 import { RequestMessage } from 'quackamole-shared-types';
-import {WebSocket} from 'uWebSockets.js';
+import { USocket } from '../QuackamoleServer';
 import { handleMessageRelay } from './handleMessageRelay';
 import { handlePluginSet } from './handlePluginSet';
 import { handleRoomBroadcast } from './handleRoomBroadcast';
@@ -8,7 +8,7 @@ import { handleRoomJoin } from './handleRoomJoin';
 import { handleUserLogin } from './handleUserLogin';
 import { handleUserRegister } from './handleUserRegister';
 
-export type MessageHandler = (ws: WebSocket, message: RequestMessage) => void;
+export type MessageHandler = (ws: USocket, message: RequestMessage) => void;
 
 export const messageHandlers: Record<RequestMessage['type'], MessageHandler> = {
   'request__user_register': handleUserRegister,

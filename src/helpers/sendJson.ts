@@ -1,5 +1,5 @@
-import { WebSocket } from 'uWebSockets.js';
+import { USocket } from '../QuackamoleServer';
 
-export const sendJson = <T>(ws: WebSocket, message: T): void => {
+export const sendJson = <T>(ws: USocket, message: T): void => {
   ws.send(JSON.stringify(message));
 };

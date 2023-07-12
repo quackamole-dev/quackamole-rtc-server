@@ -1,9 +1,9 @@
 import { IBroadcastMessage, RequestMessage } from 'quackamole-shared-types';
-import { WebSocket } from 'uWebSockets.js';
+import { USocket } from '../QuackamoleServer';
 import { publishJson } from '../helpers/publishJson';
 import { MessageHandler } from '.';
 
-export const handleRoomBroadcast: MessageHandler = (ws: WebSocket, message: RequestMessage): void => {
+export const handleRoomBroadcast: MessageHandler = (ws: USocket, message: RequestMessage): void => {
   if (message.type !== 'request__room_broadcast') throw new Error(`wrong action ${message.type} for handler handleRoomBroadcast`);
   for (const id of message.body.roomIds) {
     const topic = `rooms/${id}`;
