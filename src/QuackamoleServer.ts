@@ -58,6 +58,7 @@ export class QuackamoleServer {
           // IMPORTANT: req cannot be used after await https://github.com/uNetworking/uWebSockets.js/discussions/328#discussioncomment-173449
           // It's available within the handler but any data needed (parameters, query, body) must be gathered before await!
           setCorsHeaders(res); // FIXME writeStatus() must be called before otherwise response with default status. Rethink where to set cors
+          console.log(`incoming http '${route.method}' request`, route.route);
           await route.handler(res, req);
         } catch (e) {
           // TODO ensure res.end() || res.close() can never be called multiple times, as that will crash the server

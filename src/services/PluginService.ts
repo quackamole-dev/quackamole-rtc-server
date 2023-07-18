@@ -8,7 +8,10 @@ export class PluginService {
     'gomoku': { id: 'gomoku', name: 'Gomoku', url: 'https://quackamole-dev.github.io/quackamole-plugin-gomoku/', description: '', version: '0.0.1' },
     '2d_shooter': { id: '2d_shooter', name: '2d Shooter (WIP)', url: 'https://andreas-schoch.github.io/quackamole-plugin-2d-topdown-shooter/', description: '', version: '0.0.1' },
     'breakout_game': { id: 'breakout_game', name: 'Breakout game', url: 'https://andreas-schoch.github.io/breakout-game/', description: '', version: '0.0.1' },
-    'snowboarding_game': { id: 'snowboarding_game', name: 'Snowboarding Game', url: 'https://snowboarding.game', description: '', version: '0.0.1' }
+    'snowboarding_game': { id: 'snowboarding_game', name: 'Snowboarding Game', url: 'https://snowboarding.game', description: '', version: '0.0.1' },
+    'marching_squares_world': { id: 'marching_squares_world', name: 'Marching Squares World', url: 'https://andreas-schoch.github.io/marching-squares-world', description: '', version: '0.0.1' },
+    'multiplayer_2048': { id: 'multiplayer_2048', name: 'Multiplayer 2048', url: 'https://quackamole-dev.github.io/quackamole-plugin-2048/', description: '', version: '0.0.1' },
+    'multiplayer_2048_local': { id: 'multiplayer_2048_local', name: 'Multiplayer 2048 local', url: 'http://localhost:5173', description: '', version: '0.0.1' },
   };
 
   constructor() {
