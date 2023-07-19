@@ -7,7 +7,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint src",
-    "build": "tsc --target es6 --watch",
+    "build": "tsc --target es6",
     "start": "nodemon dist/index.js"
   },
   "keywords": [],

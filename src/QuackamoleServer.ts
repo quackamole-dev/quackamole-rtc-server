@@ -1,7 +1,6 @@
 import { randomUUID } from 'crypto';
 import fs from 'fs';
 import path from 'path';
-import { lookup } from 'mime-types';
 import { IRoomEventLeaveMessage, IUser, RequestMessage } from 'quackamole-shared-types';
 import { App, SSLApp, TemplatedApp, WebSocket, us_listen_socket_close } from 'uWebSockets.js';
 import { publishJson } from './helpers/publishJson';
