@@ -71,8 +71,8 @@ export class QuackamoleServer {
     // // TODO remove or disable for PROD builds- This is to be used during development only.
     this.app.get('/*', (res, req) => {
       try {
-        let requestPath = req.getUrl();
-        if (requestPath == '/') requestPath = '/index.html';
+        let requestPath = req.getUrl().split('#')[0];
+        if (requestPath === '/') requestPath = '/index.html';
         const filePath = path.join(__dirname, 'public', requestPath);
         if (!filePath.startsWith(path.resolve(__dirname, 'public'))) res.writeStatus('403 permission_denied').end();
         if (!fs.existsSync(filePath)) { res.writeStatus('404 Not Found').end(); return; }
