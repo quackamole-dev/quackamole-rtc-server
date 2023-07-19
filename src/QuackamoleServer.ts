@@ -69,20 +69,20 @@ export class QuackamoleServer {
     });
 
     // // TODO remove or disable for PROD builds- This is to be used during development only.
-    this.app.get('/*', (res, req) => {
-      try {
-        let requestPath = req.getUrl().split('#')[0];
-        if (requestPath === '/') requestPath = '/index.html';
-        const filePath = path.join(__dirname, 'public', requestPath);
-        if (!filePath.startsWith(path.resolve(__dirname, 'public'))) res.writeStatus('403 permission_denied').end();
-        if (!fs.existsSync(filePath)) { res.writeStatus('404 Not Found').end(); return; }
-        const content = fs.readFileSync(filePath).toString();
-        const mimeType = lookup(filePath);
-        res.writeHeader('Content-Type', mimeType || 'text/plain').writeStatus('200 OK').end(content);
-      } catch (e) {
-        res.writeStatus('500 Internal Server Error').end();
-      }
-    });
+  //   this.app.get('/*', (res, req) => {
+  //     try {
+  //       let requestPath = req.getUrl().split('#')[0];
+  //       if (requestPath === '/') requestPath = '/index.html';
+  //       const filePath = path.join(__dirname, 'public', requestPath);
+  //       if (!filePath.startsWith(path.resolve(__dirname, 'public'))) res.writeStatus('403 permission_denied').end();
+  //       if (!fs.existsSync(filePath)) { res.writeStatus('404 Not Found').end(); return; }
+  //       const content = fs.readFileSync(filePath).toString();
+  //       const mimeType = lookup(filePath);
+  //       res.writeHeader('Content-Type', mimeType || 'text/plain').writeStatus('200 OK').end(content);
+  //     } catch (e) {
+  //       res.writeStatus('500 Internal Server Error').end();
+  //     }
+  //   });
   }
 
   start(): Promise<QuackamoleServer> {
